@@ -18,9 +18,12 @@ Bundle 'plasticboy/vim-markdown'
 Bundle 'flazz/vim-colorschemes'
 Bundle 'Lokaltog/vim-powerline'
 Bundle 'Valloric/YouCompleteMe'
-Bundle 'ShowMarks'
 Bundle 'python-syntax'
-Bundle 'DoxygenToolkit'
+Bundle 'mrtazz/DoxygenToolkit'
+Bundle 'syntastic'
+"Bundle 'davidhalter/jedi-vim'
+Bundle 'Yggdroot/indentLine'
+Bundle 'airblade/vim-gitgutter'
 
 "vundle配置必须开启插件
 filetype plugin indent on
@@ -135,9 +138,7 @@ autocmd bufnewfile *.py call InsertPythonHeadComment()
 "Powerline
 set encoding=utf-8 " Necessary to show Unicode glyphs
 set t_Co=256	   " Explicitly tell Vim that the terminal supports 256 colors. show colored statusline.
-
-let g:Powerline_cache_enabled = 1
-let g:Powerline_symbols = 'unicode'
+let g:Powerline_symbols='unicode'
 let g:Powerline_stl_path_style = 'full'
 
 " NerdTree
@@ -146,45 +147,80 @@ let NERDTreeWinSize=30
 "let NERDTreeQuitOnOpen=1
 let NERDChristmasTree=1
 let NERDTreeWinPos='left'
+let NERDTreeIgnore=['\.pyc$', '\.pyo$', '\.obj$', '\.o$', '\.so$', '\.egg$', '^\.git$', '^\.svn$', '^\.hg$', '\.swp$']
 
 "Tagbar
 nnoremap <silent> <F4> :TagbarToggle<CR>
 let g:tagbar_ctags_bin='/usr/local/bin/ctags'
 let g:tagbar_width=30
 let g:tagbar_autofocus=1
-"let g:tagbar_autoclose=1
-
-"ShowMark
-let showmarks_enable = 1
-let showmarks_include = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-let showmarks_hlline_lower = 1
-let showmarks_hlline_upper = 1 
-" Ignore help, quickfix, non-modifiable buffers
-let showmarks_ignore_type = "hqm"
-"<Leader>mt   - 打开/关闭ShowMarks插件
-"<Leader>mo   - 强制打开ShowMarks插件
-"<Leader>mh   - 清除当前行的标记
-"<Leader>ma   - 清除当前缓冲区中所有的标记
-"<Leader>mm   - 在当前行打一个标记，使用下一个可用的标记名 
 
 "YouCompleteMe
 let g:ycm_global_ycm_extra_conf = '~/.ycm_global_ycm_extra_conf'
 nnoremap <leader>jd :YcmCompleter GoToDefinitionElseDeclaration<CR>   “按,jd 会跳转到定义
-let g:ycm_error_symbol='>>'
-let g:ycm_warning_symbol='>*'
 let g:ycm_enable_diagnostic_signs=1
 let g:ycm_confirm_extra_conf=0
+let g:ycm_min_num_of_chars_for_completion=2	" 从第2个键入字符就开始罗列匹配项
 let g:ycm_collect_identifiers_from_tag_files = 1
+let g:ycm_seed_identifiers_with_syntax = 1 " 语法关键字补全
+let g:ycm_register_as_syntastic_checker = 0
+let g:ycm_cache_omnifunc=0	" 禁止缓存匹配项,每次都重新生成匹配项
+let g:ycm_complete_in_comments = 1 " 在注释输入中也能补全
+let g:ycm_complete_in_strings = 1 "在字符串输入中也能补全
+"let g:ycm_filetype_whitelist = {
+"            \'c':1,
+"            \'cpp':1,
+"            \'php':1,
+"            \'python':1,
+"            \}
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif	"离开插入模式后自动关闭预览窗口
+inoremap <expr> <CR>       pumvisible() ? "\<C-y>" : "\<CR>"	"回车即选中当前项
+"上下左右键的行为 会显示其他信息
+inoremap <expr> <Down>     pumvisible() ? "\<C-n>" : "\<Down>"
+inoremap <expr> <Up>       pumvisible() ? "\<C-p>" : "\<Up>"
+inoremap <expr> <PageDown> pumvisible() ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
+inoremap <expr> <PageUp>   pumvisible() ? "\<PageUp>\<C-p>\<C-n>" : "\<PageUp>"
 
 "DoxygenToolkit
 let g:DoxygenTookit_briefTag_pre="@Synopsis "
 let g:DoxygenToolkit_paramTag_pre="@Param "
 let g:DoxygenToolkit_returnTag="@Return "
-"let g:DoxygenToolkit_blockHeader="--------------------------------------------------------------------------" 
-"let g:DoxygenToolkit_blockFooter="----------------------------------------------------------------------------"
 let g:DoxygenToolkit_authorName="waikeungshen"
 let s:licenseTag="Copyright(C)\<enter>"
 let s:licenseTag=s:licenseTag . "All right reserved\<enter>"
 let g:DoxygenToolkit_licenseTag=s:licenseTag
 let g:DoxygenToolkit_briefTag_funcName="yes"
 "let g:doxygen_enhanced_color=1
+
+"syntastic
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+let g:syntastic_error_symbol = '✗'
+let g:syntastic_warning_symbol = '⚠'
+let g:syntastic_enable_balloons = 1
+
+let g:syntastic_objc_compiler = "clang"
+let g:syntastic_c_check_header = 1
+let g:syntastic_c_auto_refresh_includes = 1
+
+let g:syntastic_objc_compiler = "clang"
+let g:syntastic_objc_check_header = 1
+let g:syntastic_objc_auto_refresh_includes = 1
+
+
+" indentLine
+" Vim
+let g:indentLine_color_term = 239
+"GVim
+let g:indentLine_color_gui = '#A4E57E'
+let g:indentLine_char = '¦'
+
+"python-syntax
+let python_highlight_all = 1
